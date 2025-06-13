@@ -67,16 +67,16 @@ jobs:
           aws ecr create-repository --repository-name "$IMAGE_NAME_FLASK"
 
       
-      # Build, tag, and push for appointment image
-      - name: Build Appointment Docker image
-        run: docker build -t $IMAGE_NAME_APPOINTMENT -f ${{ env.DOCKER_DIR_FLASK }}/Dockerfile ${{ env.DOCKER_DIR_FLASK }}
+      # Build, tag, and push for Flask image
+      - name: Build Flask Docker image
+        run: docker build -t $IMAGE_NAME_FLASK -f ${{ env.DOCKER_DIR_FLASK }}/Dockerfile ${{ env.DOCKER_DIR_FLASK }}
       
-      - name: Tag Appointment Docker image
+      - name: Tag Flask Docker image
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           docker tag $IMAGE_NAME_FLASK:latest $ECR_REGISTRY/$IMAGE_NAME_FLASK:v1
       
-      - name: Push Appointment Docker image to ECR
+      - name: Push Flask Docker image to ECR
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           docker push $ECR_REGISTRY/$IMAGE_NAME_FLASK:v1
