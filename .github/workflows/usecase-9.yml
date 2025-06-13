@@ -24,7 +24,7 @@ jobs:
     name: Docker Build + Terraform Apply/Destroy
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME_FLASK: flask-app
+      IMAGE_NAME_FLASK: flask_app
       AWS_REGION: ap-south-1
       DOCKER_DIR_FLASK: Api-Flask
     steps:
@@ -64,7 +64,7 @@ jobs:
       - name: Ensure ECR Repositories Exist
         run: |
           aws ecr describe-repositories --repository-names "$IMAGE_NAME_FLASK" || \
-          aws ecr create-repository --repository-name "$IMAGE_NAME_APPOINTMENT"
+          aws ecr create-repository --repository-name "$IMAGE_NAME_FLASK"
 
       
       # Build, tag, and push for appointment image
