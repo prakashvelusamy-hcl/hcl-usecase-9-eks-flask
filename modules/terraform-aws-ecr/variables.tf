@@ -1,4 +1,4 @@
 variable "environment" {
-    description = "The environment name"
-    type = string
+  description = "The environment name"
+  type        = string
 }
