@@ -83,7 +83,8 @@ jobs:
       - name: Verify Cluster Access
         run: |
           kubectl get nodes
-
+      - name: Check current directory
+        run: pwd
       - name: EKS Deployment + Service + Ingress
         run: |
          kubectl apply -f modules/terraform-aws-apps/deployment.yml
