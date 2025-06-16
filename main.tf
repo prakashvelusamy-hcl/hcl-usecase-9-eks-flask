@@ -22,9 +22,9 @@ module "eks" {
   cluster_role_dependency     = module.iam.eks_role_depends_on
   vpc_id                      = module.vpc.vpc_id
 }
-module "apps" {
-  source = "./modules/terraform-aws-apps"
-}
+#module "apps" {
+#  source = "./modules/terraform-aws-apps"
+#}
 
 # module "service_account" {
 #   source = "./modules/terraform-aws-serviceaccount"
