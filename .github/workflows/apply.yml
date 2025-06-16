@@ -87,6 +87,6 @@ jobs:
         run: pwd
       - name: EKS Deployment + Service + Ingress
         run: |
-         kubectl apply -f ./modules/terraform-aws-apps/deployment.yml
-         kubectl apply -f  ./modules/terraform-aws-apps/service.yml
-         kubectl apply -f  ./modulesterraform-aws-apps/ingress.yml
+          kubectl apply -f ./modules/terraform-aws-apps/deployment.yaml
+          kubectl apply -f ./modules/terraform-aws-apps/service.yaml
+          kubectl apply -f ./modules/terraform-aws-apps/ingress.yaml
