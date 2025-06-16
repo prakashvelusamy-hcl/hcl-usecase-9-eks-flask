@@ -16,7 +16,6 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_apps"></a> [apps](#module\_apps) | ./modules/terraform-aws-apps | n/a |
 | <a name="module_eks"></a> [eks](#module\_eks) | ./modules/terraform-aws-eks | n/a |
 | <a name="module_helm"></a> [helm](#module\_helm) | ./modules/terraform-aws-helm | n/a |
 | <a name="module_iam"></a> [iam](#module\_iam) | ./modules/terraform-aws-iam | n/a |
