@@ -44,4 +44,5 @@ module "helm" {
   lbc_iam_role_arn                   = module.iam.lbc_iam_role_arn
   vpc_id                             = module.vpc.vpc_id
   region                             = var.region
+  depends_on = [module.eks]
 }
