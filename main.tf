@@ -21,16 +21,12 @@ module "eks" {
   eks_oidc_root_ca_thumbprint = var.eks_oidc_root_ca_thumbprint
   cluster_role_dependency     = module.iam.eks_role_depends_on
   vpc_id                      = module.vpc.vpc_id
+  depends_on = [module.vpc]
 }
 #module "apps" {
 #  source = "./modules/terraform-aws-apps"
 #}
 
-# module "service_account" {
-#   source = "./modules/terraform-aws-serviceaccount"
-#   cluster_name = module.eks.cluster_name
-#   region = var.region
-# }
 
 module "iam" {
   source                                           = "./modules/terraform-aws-iam"
