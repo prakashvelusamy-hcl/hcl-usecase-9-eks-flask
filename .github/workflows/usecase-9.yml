@@ -15,7 +15,6 @@ on:
           - destroy
           - apply
 
-
 permissions:
       id-token: write
       contents: write
@@ -80,6 +79,46 @@ jobs:
         run: |
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           docker push $ECR_REGISTRY/$IMAGE_NAME_FLASK:v1
+  deploy:
+    name: Deploy App and ALB Ingress
+    needs: build-push-Flask-app  # Optional: Run sequentially after job1
+    runs-on: ubuntu-latest
+
+    env:
+      CLUSTER_NAME: EKS
+      AWS_REGION: ap-south-1
+      NAMESPACE: default
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::495599733393:role/OIDC
+          aws-region: ap-south-1
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+
+      - name: Verify Cluster Access
+        run: |
+          kubectl get nodes
+                
+
+      - name: Deployment + Service + Ingress
+        run: |
+         sed -i 's@CONTAINER_IMAGE@'"${{ vars.ECR_REGISTRY }}/flask-app:${{ github.sha }}"'@' k8s/deployment.yml
+         kubectl apply -f k8s/deployment.yml
+         kubectl apply -f k8s/ingress.yml
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
