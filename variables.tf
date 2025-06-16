@@ -11,6 +11,7 @@ variable "region" {
 #   description = "The Environment we are using"
 #   type = string
 # }
+#
 variable "pub_sub_count" {
   description = "Number of public subnets"
   type        = number
