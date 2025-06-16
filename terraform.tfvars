@@ -1,6 +1,6 @@
 vpc_cidr = "10.10.0.0/16"
 region   = "ap-south-1"
-# environment       = "dev"
+## environment       = "dev"
 pub_sub_count               = 2
 priv_sub_count              = 2
 nat_count                   = 1
