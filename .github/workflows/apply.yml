@@ -1,0 +1,93 @@
+name: Build and Push to ECR
+on:
+  push:
+    paths:
+      - 'app/**'
+      - 'k8s/**'
+      - '.github/workflows/apply.yaml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+
+jobs:
+  build-push-Flask-app:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME_FLASK: flask_app
+      AWS_REGION: ap-south-1
+      DOCKER_DIR_FLASK: Api-Flask
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::495599733393:role/OIDC
+          aws-region: ap-south-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Ensure ECR Repositories Exist
+        run: |
+          aws ecr describe-repositories --repository-names "$IMAGE_NAME_FLASK" || \
+          aws ecr create-repository --repository-name "$IMAGE_NAME_FLASK"
+      - name: Build Flask Docker image
+        run: docker build -t $IMAGE_NAME_FLASK -f ${{ env.DOCKER_DIR_FLASK }}/Dockerfile ${{ env.DOCKER_DIR_FLASK }}
+      
+      - name: Tag Flask Docker image
+        run: |
+          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          docker tag $IMAGE_NAME_FLASK:latest $ECR_REGISTRY/$IMAGE_NAME_FLASK:v1
+      
+      - name: Push Flask Docker image to ECR
+        run: |
+          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          docker push $ECR_REGISTRY/$IMAGE_NAME_FLASK:v1
+
+  deploy:
+    name: Deploy App and ALB Ingress
+    needs: build-push-Flask-app  
+    runs-on: ubuntu-latest
+
+    env:
+      CLUSTER_NAME: EKS
+      AWS_REGION: ap-south-1
+      NAMESPACE: default
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::495599733393:role/OIDC
+          aws-region: ap-south-1
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+
+      - name: Verify Cluster Access
+        run: |
+          kubectl get nodes
+
+      - name: EKS Deployment + Service + Ingress
+        run: |
+         kubectl apply -f terraform-aws-apps/deployment.yml
+         kubectl apply -f  terraform-aws-apps/service.yml
+         kubectl apply -f  terraform-aws-apps/ingress.yml
